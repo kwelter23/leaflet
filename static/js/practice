@@ -1,8 +1,6 @@
+// Pulled 10/10/20 at 3:25 PM Significant earthquakes in the last 30 days
 //URL 
-// Significant earthquakes in the last 30 days
-//var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
-// All earthquakes in the last 7 days
-var url ="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
 
 // Grabbing our GeoJSON data..
 d3.json(url, function(data) {
@@ -10,55 +8,30 @@ d3.json(url, function(data) {
     createFeatures(data.features);
 });
 
+// Define a markerSize function that will give each city a different radius based on its population
+function markerSize(magnitude) {
+    return magnitude / 40;
+  }
+
 function createFeatures(earthquakeData) {
     // Define a function we want to run once for each feature in the features array
     // Give each feature a popup describing the place and time of the earthquake
 
-    // Define a markerSize function that will give each city a different radius based on its population
-    function markerSize(magnitude) {
-        return magnitude * 3;
-    }
-
-    function markerColor(depth) {
-        console.log(depth)
-        if (depth > 90) {
-            return "red";
-        }
-        else if (depth > 70 && depth <= 90) {
-            return "DarkOrange";
-        }
-        else if (depth > 50 && depth <= 70) {
-            return "Orange";
-        }
-        else if (depth > 30 && depth <= 50) {
-            return "GoldenRod";
-        }
-        else if (depth > 10 && depth <= 30) {
-            return "GreenYellow";
-        }
-        else {
-            return "green";
-        }
-    }
-
     function onEachFeature(feature, layer) {
-        layer.bindPopup("<h3>" + feature.properties.place +
+        L.circle(feature.properties.mag, {
+            fillOpacity: 0.75,
+            color: "black",
+            fillColor: "purple",
+            // Setting our circle's radius equal to the output of our markerSize function
+            // This will make our marker's size proportionate to its population
+            radius: markerSize(feature.properties.mag)
+          }).bindPopup("<h3>" + feature.properties.place +
         "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
-    }
-
-    function createMarker(feature, latlng) {
-        var myStyle = {
-            radius: markerSize(feature.properties.mag),
-            fillOpacity: 0.5,
-            color: markerColor(feature.geometry.coordinates[2]),
-        }
-        return new L.CircleMarker(latlng, myStyle)
     }
 
     // Create a GeoJSON layer containing the features array on the earthquakeData object
     // Run the onEachFeature function once for each piece of data in the array
     var earthquakes = L.geoJSON(earthquakeData, {
-        pointToLayer: createMarker,
         onEachFeature: onEachFeature
     });
 
@@ -90,7 +63,7 @@ function createMap(earthquakes) {
         id: "outdoors-v11",
         accessToken: API_KEY
     });
- 
+
     // Define a baseMaps object to hold our base layers
     var baseMaps = {
         "Satellite": satellite,
@@ -107,7 +80,7 @@ function createMap(earthquakes) {
     // Create our map, giving it the satellite and earthquakes layers to display on load
     var myMap = L.map("map", {
         center: [15.5994, -28.6731],
-        zoom: 1.5,
+        zoom: 3,
         layers: [satellite, earthquakes]
     });
 
@@ -118,12 +91,4 @@ function createMap(earthquakes) {
         collapsed: false
     }).addTo(myMap);
 }
-  /*
-     var markers = L.circle(feature.properties.place, {
-        fillOpacity: 0.75,
-        color: "black",
-        fillColor: "purple",
-        // Setting our circle's radius equal to the output of our markerSize function
-        // This will make our marker's size proportionate to its population
-        radius: markerSize(feature.properties.mag)
-    })*/
+  
