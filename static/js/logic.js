@@ -2,9 +2,17 @@
 // Significant earthquakes in the last 30 days
 //var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson";
 // All earthquakes in the last 7 days
-var url ="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+var url ="https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
-// Grabbing our GeoJSON data..
+var platesUrl = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_plates.json";
+
+/*// Grabbing our plates GeoJSON data..
+d3.json(platesUrl, function(platesData) {
+    // Once we get a response, send the data.features object to the createFeatures function
+    createFeatures(platesData.features);
+});*/
+
+// Grabbing our earthquake GeoJSON data..
 d3.json(url, function(data) {
     // Once we get a response, send the data.features object to the createFeatures function
     createFeatures(data.features);
@@ -20,7 +28,6 @@ function createFeatures(earthquakeData) {
     }
 
     function markerColor(depth) {
-        console.log(depth)
         if (depth > 90) {
             return "red";
         }
@@ -50,7 +57,7 @@ function createFeatures(earthquakeData) {
         var myStyle = {
             radius: markerSize(feature.properties.mag),
             fillOpacity: 0.5,
-            color: markerColor(feature.geometry.coordinates[2]),
+            color: markerColor(feature.geometry.coordinates[2])
         }
         return new L.CircleMarker(latlng, myStyle)
     }
@@ -110,6 +117,33 @@ function createMap(earthquakes) {
         zoom: 1.5,
         layers: [satellite, earthquakes]
     });
+   
+    var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function() {
+ 
+var mapColors = ["green", "greenyellow", "goldenrod", "orange", "darkorange", "red"];
+ 
+       //The labels for each color
+       var labels = ["-10 - 10 km", "10 - 30 km", "30 - 50 km", "50 - 70 km", "70 - 90 km", "90+ km"];
+ 
+       //Start the ordered list
+       var list = '<ul style="list-style-type:none;"><li><b>Earthquake Depth</b></li>';
+      
+       //Create the div
+       var div = L.DomUtil.create("div");
+ 
+       //Add list item for each color
+       labels.forEach(function(x, index) {
+           list += '<li>' + '<span style="color:' + mapColors[index] + '; background-color:' + mapColors[index] + '">box</span>' +
+           '<span style="color:black">' + '&nbsp&nbsp&nbsp' + labels[index] + '</span></li>';
+       });
+ 
+       //Finish off the list html
+       div.innerHTML += list + "</ul>";
+       return div;
+  };
+  // Adding legend to the map
+  legend.addTo(myMap);
 
     // Create a layer control
     // Pass in our baseMaps and overlayMaps
@@ -117,13 +151,6 @@ function createMap(earthquakes) {
     L.control.layers(baseMaps, overlayMaps, {
         collapsed: false
     }).addTo(myMap);
+
+
 }
-  /*
-     var markers = L.circle(feature.properties.place, {
-        fillOpacity: 0.75,
-        color: "black",
-        fillColor: "purple",
-        // Setting our circle's radius equal to the output of our markerSize function
-        // This will make our marker's size proportionate to its population
-        radius: markerSize(feature.properties.mag)
-    })*/
