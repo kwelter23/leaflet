@@ -117,36 +117,35 @@ function createMap(earthquakes) {
         zoom: 1.5,
         layers: [satellite, earthquakes]
     });
-   
-    var legend = L.control({ position: "bottomright" });
-  legend.onAdd = function() {
+//Breate Legend
+var legend = L.control({ position: "bottomright" });
+legend.onAdd = function() {
  
 var mapColors = ["green", "greenyellow", "goldenrod", "orange", "darkorange", "red"];
  
-       //The labels for each color
-       var labels = ["-10 - 10 km", "10 - 30 km", "30 - 50 km", "50 - 70 km", "70 - 90 km", "90+ km"];
+    //Ranges for each color
+    var labels = ["-10 - 10 km", "10 - 30 km", "30 - 50 km", "50 - 70 km", "70 - 90 km", "90+ km"];
  
-       //Start the ordered list
-       var list = '<ul style="list-style-type:none;"><li><b>Earthquake Depth</b></li>';
+    //Start the list
+    var list = '<ul style="list-style-type:none;"><li><b>Earthquake Depth</b></li>';
       
-       //Create the div
-       var div = L.DomUtil.create("div");
+    //Create div
+    var div = L.DomUtil.create("div");
  
-       //Add list item for each color
-       labels.forEach(function(x, index) {
-           list += '<li>' + '<span style="color:' + mapColors[index] + '; background-color:' + mapColors[index] + '">box</span>' +
-           '<span style="color:black">' + '&nbsp&nbsp&nbsp' + labels[index] + '</span></li>';
-       });
+    //Add list item for each color
+    labels.forEach(function(x, index) {
+        list += '<li>' + '<span style="color:' + mapColors[index] + '; background-color:' + mapColors[index] + '">box</span>' +
+        '<span style="color:black">' + '&nbsp&nbsp&nbsp' + labels[index] + '</span></li>';
+    });
  
-       //Finish off the list html
-       div.innerHTML += list + "</ul>";
-       return div;
+     //Finish html
+    div.innerHTML += list + "</ul>";
+    return div;
   };
+
   // Adding legend to the map
   legend.addTo(myMap);
 
-    // Create a layer control
-    // Pass in our baseMaps and overlayMaps
     // Add the layer control to the map
     L.control.layers(baseMaps, overlayMaps, {
         collapsed: false
